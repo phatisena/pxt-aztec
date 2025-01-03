@@ -184,7 +184,7 @@ namespace aztec {
     }
 
     //%blockid=aztec_createaztecimage
-    //%block="create aztec image $text gap $gap|| ec level $sec layer $lay"
+    //%block="create aztec image by| text $text gap $gap|| ec level $sec layer $lay"
     //%text.defl="MAKECODE-ARCADE"
     //%gap.defl=4
     //%group="image"
