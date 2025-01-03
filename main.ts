@@ -101,7 +101,7 @@ namespace aztec {
             enc.pop(); // remove 0-byte
             el = enc.shift() / b | 0; // get encoding length
         }
-        if (el > 1660) return [[]]; // message too long
+        if (el > 1660) return [[1,0,0,0,1],[0,1,0,1,0],[0,0,1,0,0],[0,1,0,1,0],[1,0,0,0,1]]; // message too long
         typ = j > 608 || el > 64 || (lay && lay > 4) ? 14 : 11; // full or compact Aztec finder size
         let mod = parseInt(text); // Aztec rune possible?
         if (mod < 0 || mod > 255 || mod + "" != text || lay != 0) // Aztec rune 0-255 ?
