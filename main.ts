@@ -20,6 +20,50 @@ namespace aztec {
         return nar
     }
 
+    function stream(seq:number[], val:number, bits:number) { // add data to bit stream 
+            let eb = seq[0] % b + bits; // first element is length in bits
+            val <<= b; seq[0] += bits; // b - word size in bits
+            seq[seq.length - 1] |= val >> eb; // add data
+            while (eb >= b) { // word full?
+                bits = seq[seq.length - 1] >> 1;
+                if (typ == 0 && (bits == 0 || 2 * bits + 2 == 1 << b)) { // bit stuffing: all 0 or 1
+                    seq[seq.length - 1] = 2 * bits + (1 & bits ^ 1); // insert complementary bit
+                    seq[0]++; eb++;
+                }
+                eb -= b;
+                seq.push((val >> eb) & ((1 << b) - 1));
+            }
+    }
+
+    function binary(seq:number[], pos:number) { // encode numBytes of binary
+            seq[0] -= numBytes * 8 + (numBytes > 31 ? 16 : 5); // stream() adjusts len too -> remove
+            stream(seq, numBytes > 31 ? 0 : numBytes, 5); // len
+            if (numBytes > 31) stream(seq, numBytes - 31, 11); // long len
+            for (let i = pos - numBytes; i < pos; i++)
+                stream(seq, text.charCodeAt(i), 8); // bytes
+    }
+
+    /** compute Reed Solomon error detection and correction */
+        function rs(ec:number, s:number, p:number) { // # of checkwords, polynomial bit size, generator polynomial
+            let rc = addNumArr(ec + 2), i=0, j=0, el = enc.length; // reed/solomon code
+            let lg = addNumArr(s + 1), ex = addNumArr(s); // log/exp table for multiplication
+            for (j = 1, i = 0; i < s; i++) { // compute log/exp table of Galois field
+                ex[i] = j; lg[j] = i;
+                j += j; if (j > s) j ^= p; // GF polynomial
+            }
+            for (rc[ec + 1] = i = 0; i <= ec; i++) // compute RS generator polynomial
+                for (j = ec - i, rc[j] = 1; j++ < ec;)
+                    rc[j] = rc[j + 1] ^ ex[(lg[rc[j]] + i) % s];
+            for (i = 0; i < el; i++) // compute RS checkwords
+                for (j = 0, p = enc[el] ^ enc[i]; j++ < ec;)
+                    enc[el + j - 1] = enc[el + j] ^ (p ? ex[(lg[rc[j]] + lg[p]) % s] : 0);
+        }
+
+    function move(dx:number, dy:number) { // move one cell
+            do x += dx; while (typ == 7 && (x & 15) == 0); // skip reference grid
+            do y += dy; while (typ == 7 && (y & 15) == 0);
+    }
+    
     function azgen(text:string, sec:number, lay:number):number[][] { // make Aztec bar code
         let e = 20000;let BackTo, numBytes=0, CharSiz = [5, 5, 5, 5, 4];
         let LatLen = [[0, 5, 5, 10, 5, 10], [9, 0, 5, 10, 5, 10], [5, 5, 0, 5, 10, 10],
@@ -37,27 +81,6 @@ namespace aztec {
             "  0123456789,."]; // digit
         let enc:number[] = [], el=text.length, a:number, b:number, typ = 0, x=0, y=0, ctr=0, c=0, i=0, j=0, l=0;
 
-        function stream(seq:number[], val:number, bits:number) { // add data to bit stream 
-            let eb = seq[0] % b + bits; // first element is length in bits
-            val <<= b; seq[0] += bits; // b - word size in bits
-            seq[seq.length - 1] |= val >> eb; // add data
-            while (eb >= b) { // word full?
-                bits = seq[seq.length - 1] >> 1;
-                if (typ == 0 && (bits == 0 || 2 * bits + 2 == 1 << b)) { // bit stuffing: all 0 or 1
-                    seq[seq.length - 1] = 2 * bits + (1 & bits ^ 1); // insert complementary bit
-                    seq[0]++; eb++;
-                }
-                eb -= b;
-                seq.push((val >> eb) & ((1 << b) - 1));
-            }
-        }
-        function binary(seq:number[], pos:number) { // encode numBytes of binary
-            seq[0] -= numBytes * 8 + (numBytes > 31 ? 16 : 5); // stream() adjusts len too -> remove
-            stream(seq, numBytes > 31 ? 0 : numBytes, 5); // len
-            if (numBytes > 31) stream(seq, numBytes - 31, 11); // long len
-            for (let i = pos - numBytes; i < pos; i++)
-                stream(seq, text.charCodeAt(i), 8); // bytes
-        }
         /** encode text */
         sec = 100 / (100 - Math.min(Math.max(sec || 25, 0), 90)); // limit percentage of check words to 0-90%
         for (j = c = 4; ; c = b) { // compute word size b: 6/8/10/12 bits
@@ -109,21 +132,7 @@ namespace aztec {
         let ec = Math.floor((8 * lay * (typ + 2 * lay)) / b) - el; // # of error words
         typ >>= 1; ctr = typ + 2 * lay; ctr += (ctr - 1) / 15 | 0; // center position
 
-        /** compute Reed Solomon error detection and correction */
-        function rs(ec:number, s:number, p:number) { // # of checkwords, polynomial bit size, generator polynomial
-            let rc = addNumArr(ec + 2), i=0, j=0, el = enc.length; // reed/solomon code
-            let lg = addNumArr(s + 1), ex = addNumArr(s); // log/exp table for multiplication
-            for (j = 1, i = 0; i < s; i++) { // compute log/exp table of Galois field
-                ex[i] = j; lg[j] = i;
-                j += j; if (j > s) j ^= p; // GF polynomial
-            }
-            for (rc[ec + 1] = i = 0; i <= ec; i++) // compute RS generator polynomial
-                for (j = ec - i, rc[j] = 1; j++ < ec;)
-                    rc[j] = rc[j + 1] ^ ex[(lg[rc[j]] + i) % s];
-            for (i = 0; i < el; i++) // compute RS checkwords
-                for (j = 0, p = enc[el] ^ enc[i]; j++ < ec;)
-                    enc[el + j - 1] = enc[el + j] ^ (p ? ex[(lg[rc[j]] + lg[p]) % s] : 0);
-        }
+        
         /** layout Aztec barcode */
         let mat = addNumArr(2 * ctr + 1).fill(0).map(function () { return []; });
         for (y = 1 - typ; y < typ; y++) // layout central finder
@@ -132,10 +141,7 @@ namespace aztec {
         mat[ctr - typ + 1][ctr - typ] = mat[ctr - typ][ctr - typ] = 1; // orientation marks
         mat[ctr - typ][ctr - typ + 1] = mat[ctr + typ - 1][ctr + typ] = 1;
         mat[ctr - typ + 1][ctr + typ] = mat[ctr - typ][ctr + typ] = 1;
-        function move(dx:number, dy:number) { // move one cell
-            do x += dx; while (typ == 7 && (x & 15) == 0); // skip reference grid
-            do y += dy; while (typ == 7 && (y & 15) == 0);
-        }
+        
         if (lay > 0) { // layout the message
             rs(ec, (1 << b) - 1, [67, 301, 1033, 4201][b / 2 - 3]); // error correction, generator polynomial
             x = -typ; y = x - 1; // start of layer 1 at top left
