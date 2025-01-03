@@ -183,15 +183,32 @@ namespace aztec {
         to.drawTransparentImage(src, x, y)
     }
 
+    function baselen(val:number,bnv:number) {
+        let uval = bnv
+        while (uval < val) {
+            uval *= bnv
+        }
+        return uval
+    }
+
+    function checkbyte(text:string,bnv:number,mod:boolean=false) {
+        let ival = 0
+        for (let i = 0;i < text.length;i++) {
+            ival = Math.max(ival,baselen(text.charCodeAt(i),bnv))
+        }
+        if (mod) return Math.floor(ival / bnv)
+        return ival
+    }
+
     function sumbit(text:string="",subnum:number=1,renum:number=1,idxsum:boolean=false) {
         if (renum < 1) {renum = 1}
         if (subnum < 1) {subnum = 1}
-        let v = 0
+        let v = 0,nv = checkbyte(text,120,true)
         for (let i = 0;i < text.length;i++) {
-            if (idxsum) { v += ((text.charCodeAt(i)-32) * i+1) / subnum}
-            else { v += (text.charCodeAt(i)-32) / subnum}
+            if (idxsum) { v += (((text.charCodeAt(i)) * i+1) / nv) / subnum}
+            else { v += ((text.charCodeAt(i)) / nv) / subnum}
         }
-        v = (v*text.length) / ((text.length * (subnum - renum)) * (text.length * (renum + subnum)))
+        v = (v*text.length**(nv)) / ((text.length * (subnum - renum)) * (text.length * (renum + subnum) * (nv + Math.sqrt(nv))))
         return v
     }
 
@@ -227,3 +244,4 @@ namespace aztec {
         return outputgap
     }
 }
+
