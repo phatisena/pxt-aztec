@@ -195,6 +195,8 @@ namespace aztec {
         return v
     }
 
+    let inprogress = false
+
     //%blockid=aztec_createaztecimage
     //%block="create aztec image by| text $text gap $gap|| ec level $eclevel layer $layer"
     //%text.defl="MAKECODE-ARCADE"
@@ -204,6 +206,8 @@ namespace aztec {
     //%group="image"
     //%weight=10
     export function genimg(text:string="",gap:number=4,eclevel:number=null,layer:number=null) {
+        if (inprogress) {return image.create(1,1)}
+        inprogress = true
         if(eclevel === null) {eclevel = Math.min(Math.floor(Math.sqrt(sumbit(text,3.14,1.16) / ((3.14 * 3) / 4))),4)}
         if(layer === null) {layer = Math.floor(Math.sqrt(sumbit(text,3.14,1.16) / (3.14 / 2)))}
         let outputnll: number[][] = azgen(text,eclevel,layer)
@@ -219,6 +223,7 @@ namespace aztec {
         let outputgap: Image = image.create(outputimg.width + (gap * 2),outputimg.height + (gap * 2))
         outputgap.fill(1)
         stampImage(outputimg,outputgap,gap,gap)
+        inprogress = false
         return outputgap
     }
 }
