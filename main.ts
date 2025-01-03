@@ -125,9 +125,9 @@ namespace aztec {
                     enc[el + j - 1] = enc[el + j] ^ (p ? ex[(lg[rc[j]] + lg[p]) % s] : 0);
         }
         /** layout Aztec barcode */
-        let mat = addNumArr(2 * ctr + 2).fill(0).map(function () { return []; });
-        for (y = 1 - typ; y < typ; y++) // layout central finder
-            for (x = 1 - typ; x < typ; x++)
+        let mat = addNumArr(2 * ctr + 1).fill(0).map(function () { return []; });
+        for (y = 1 - typ; y <= typ; y++) // layout central finder
+            for (x = 1 - typ; x <= typ; x++)
                 mat[ctr + y][ctr + x] = Math.max(Math.abs(x), Math.abs(y)) & 1 ^ 1;
         mat[ctr - typ + 1][ctr - typ] = mat[ctr - typ][ctr - typ] = 1; // orientation marks
         mat[ctr - typ][ctr - typ + 1] = mat[ctr + typ - 1][ctr + typ] = 1;
