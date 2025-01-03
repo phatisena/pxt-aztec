@@ -188,10 +188,10 @@ namespace aztec {
         if (subnum < 1) {subnum = 1}
         let v = 0
         for (let i = 0;i < text.length;i++) {
-            if (idxsum) { v += (text.charCodeAt(i) * i+1) / subnum}
-            else { v += text.charCodeAt(i) / subnum}
+            if (idxsum) { v += ((text.charCodeAt(i)-32) * i+1) / subnum}
+            else { v += (text.charCodeAt(i)-32) / subnum}
         }
-        v = v / Math.sqrt(text.length * renum)
+        v = v / ((text.length ** (renum ** subnum)) * (text.length ** renum))
         return v
     }
 
@@ -208,8 +208,8 @@ namespace aztec {
     export function genimg(text:string="",gap:number=4,eclevel:number=null,layer:number=null) {
         if (inprogress) {return image.create(1,1)}
         inprogress = true
-        if(eclevel === null) {eclevel = Math.min(Math.floor(Math.sqrt(sumbit(text,3.14,1.16) / ((3.14 * 3) / 4))),4)}
-        if(layer === null) {layer = Math.floor(Math.sqrt(sumbit(text,3.14,1.16) / (3.14 / 2)))}
+        if(eclevel === null) {eclevel = Math.min(Math.floor(Math.sqrt(sumbit(text,3.14,1.16,true) / ((3.14 * 3) / 4))),4)}
+        if(layer === null) {layer = Math.floor(Math.sqrt(sumbit(text,3.14,1.16,true) / (3.14 / 2)))}
         let outputnll: number[][] = azgen(text,eclevel,layer)
         let outputimg: Image = image.create(outputnll[0].length,outputnll.length)
         let bin = 0
