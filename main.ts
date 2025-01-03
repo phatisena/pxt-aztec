@@ -208,8 +208,8 @@ namespace aztec {
     export function genimg(text:string="",gap:number=4,eclevel:number=null,layer:number=null) {
         if (inprogress) {return image.create(1,1)}
         inprogress = true
-        if(eclevel === null) {eclevel = Math.min(Math.floor(Math.sqrt(sumbit(text,3.14,1.16,true) / ((3.14 * 3) / 4))),4)}
-        if(layer === null) {layer = Math.floor(Math.sqrt(sumbit(text,3.14,1.16,true) / (3.14 / 2)))}
+        if(eclevel === null) {eclevel = Math.min(Math.floor(Math.sqrt(sumbit(text,3.14,1.16) / ((3.14 * 3) / 4))),4)}
+        if(layer === null) {layer = Math.floor(Math.sqrt(sumbit(text,3.14,1.16) / (3.14 / 2)))}
         let outputnll: number[][] = azgen(text,eclevel,layer)
         let outputimg: Image = image.create(outputnll[0].length,outputnll.length)
         let bin = 0
