@@ -191,9 +191,9 @@ namespace aztec {
     //%lay.min=1 lay.max=32 lay.defl=4
     //%group="image"
     //%weight=10
-    export function genimg(text:string="",gap:number=4,sec:number=undefined,lay:number=undefined) {
-        if(!(sec)) sec = Math.min(Math.floor(Math.sqrt(text.length / ((3.14 * 3) / 4))),4);
-        if(!(lay)) lay = Math.floor(Math.sqrt(text.length / (3.14 / 2)));
+    export function genimg(text:string="",gap:number=4,sec:number=NaN,lay:number=NaN) {
+        if(sec === NaN) sec = Math.min(Math.floor(Math.sqrt(text.length / ((3.14 * 3) / 4))),4);
+        if(lay === NaN) lay = Math.floor(Math.sqrt(text.length / (3.14 / 2)));
         let outputnll: number[][] = azgen(text,sec,lay)
         let outputimg: Image = image.create(outputnll[0].length,outputnll.length)
         let bin = 0
