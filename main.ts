@@ -37,7 +37,7 @@ namespace aztec {
             "  0123456789,."]; // digit
         let enc:number[] = [], el=text.length, a:number, b:number, typ = 0, x=0, y=0, ctr=0, c=0, i=0, j=0, l=0;
 
-        function stream(seq:number[], val:number, bits:number) { // add data to bit stream 
+        let stream = function(seq:number[], val:number, bits:number) { // add data to bit stream 
             let eb = seq[0] % b + bits; // first element is length in bits
             val <<= b; seq[0] += bits; // b - word size in bits
             seq[seq.length - 1] |= val >> eb; // add data
@@ -51,7 +51,7 @@ namespace aztec {
                 seq.push((val >> eb) & ((1 << b) - 1));
             }
         }
-        function binary(seq:number[], pos:number) { // encode numBytes of binary
+        let binary = function(seq:number[], pos:number) { // encode numBytes of binary
             seq[0] -= numBytes * 8 + (numBytes > 31 ? 16 : 5); // stream() adjusts len too -> remove
             stream(seq, numBytes > 31 ? 0 : numBytes, 5); // len
             if (numBytes > 31) stream(seq, numBytes - 31, 11); // long len
@@ -110,7 +110,7 @@ namespace aztec {
         typ >>= 1; ctr = typ + 2 * lay; ctr += (ctr - 1) / 15 | 0; // center position
 
         /** compute Reed Solomon error detection and correction */
-        function rs(ec:number, s:number, p:number) { // # of checkwords, polynomial bit size, generator polynomial
+        let rs = function(ec:number, s:number, p:number) { // # of checkwords, polynomial bit size, generator polynomial
             let rc = addNumArr(ec + 2), i=0, j=0, el = enc.length; // reed/solomon code
             let lg = addNumArr(s + 1), ex = addNumArr(s); // log/exp table for multiplication
             for (j = 1, i = 0; i < s; i++) { // compute log/exp table of Galois field
@@ -132,7 +132,7 @@ namespace aztec {
         mat[ctr - typ + 1][ctr - typ] = mat[ctr - typ][ctr - typ] = 1; // orientation marks
         mat[ctr - typ][ctr - typ + 1] = mat[ctr + typ - 1][ctr + typ] = 1;
         mat[ctr - typ + 1][ctr + typ] = mat[ctr - typ][ctr + typ] = 1;
-        function move(dx:number, dy:number) { // move one cell
+        let move = function(dx:number, dy:number) { // move one cell
             do x += dx; while (typ == 7 && (x & 15) == 0); // skip reference grid
             do y += dy; while (typ == 7 && (y & 15) == 0);
         }
