@@ -126,7 +126,6 @@ namespace aztec {
         }
         /** layout Aztec barcode */
         let mat = addNumArr(2 * ctr + 1).fill(0).map(function () { return []; });
-        typ += 1
         for (y = 1 - typ; y < typ; y++) // layout central finder
             for (x = 1 - typ; x < typ; x++)
                 mat[ctr + y][ctr + x] = Math.max(Math.abs(x), Math.abs(y)) & 1 ^ 1;
