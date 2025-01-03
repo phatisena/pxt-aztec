@@ -184,9 +184,11 @@ namespace aztec {
     }
 
     //%blockid=aztec_createaztecimage
-    //%block="create aztec image by| text $text gap $gap|| ec level $sec layer $lay"
+    //%block="create aztec image by| text $text gap $gap ec level $sec layer $lay"
     //%text.defl="MAKECODE-ARCADE"
     //%gap.defl=4
+    //%sec.defl=2
+    //%lay.defl=4
     //%group="image"
     //%weight=10
     export function genimg(text:string="",gap:number=4,sec:number=undefined,lay:number=undefined) {
