@@ -191,7 +191,7 @@ namespace aztec {
             if (idxsum) { v += (text.charCodeAt(i) * i+1) / subnum}
             else { v += text.charCodeAt(i) / subnum}
         }
-        v = v / ((renum ^ subnum) * (v / renum))
+        v = v / ((renum ^ subnum) * (v / renum) / subnum)
         return v
     }
 
