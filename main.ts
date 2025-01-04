@@ -107,7 +107,7 @@ namespace aztec {
         if (mod < 0 || mod > 255 || mod + "" != text || lay != 0) // Aztec rune 0-255 ?
             lay = Math.max(lay || 1, Math.min(32, (Math.ceil((Math.sqrt(j + typ * typ) - typ) / 4)))); // needed layers
         let ec = Math.floor((8 * lay * (typ + 2 * lay)) / b) - el; // # of error words
-        typ >>= 1; ctr = typ + 2 * lay; ctr += (ctr - 1) / 15 | 0; ctr <<= 1; // center position
+        typ >>= 1; ctr = typ + 3 * lay; ctr += (ctr - 1) / 15 | 0; // center position
 
         /** compute Reed Solomon error detection and correction */
         let rs = function(ec:number, s:number, p:number) { // # of checkwords, polynomial bit size, generator polynomial
