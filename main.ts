@@ -222,11 +222,11 @@ namespace aztec {
     //%layer.min=0 layer.max=32 layer.defl=4
     //%group="image"
     //%weight=10
-    export function genimg(text:string="",gap:number=4,eclevel:number=null,layer:number=null) {
+    export function genimg(text:string="",gap:number=4,eclevel:number=undefined,layer:number=undefined) {
         if (inprogress) {return image.create(1,1)}
         inprogress = true
-        if(eclevel === null) {eclevel = Math.min(Math.floor((Math.sqrt(sumbit(text,3.14,1.16,true) / ((3.14 * 3) / 4)))*4),4)}
-        if(layer === null) {layer = Math.floor(Math.sqrt(sumbit(text,1.16,3.14,true) / (3.14 / 1.16)))}
+        if(!(eclevel)) {eclevel = Math.min(Math.floor((Math.sqrt(sumbit(text,3.14,1.16,true) / ((3.14 * 3) / 4)))*4),4)}
+        if(!(layer)) {layer = Math.floor(Math.sqrt(sumbit(text,1.16,3.14,true) / (3.14 / 1.16)))}
         let outputnll: number[][] = azgen(text,eclevel,layer)
         let outputimg: Image = image.create(outputnll[0].length,outputnll.length)
         let bin = 0
