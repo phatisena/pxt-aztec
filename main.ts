@@ -218,15 +218,15 @@ namespace aztec {
     //%block="create aztec image by| text $text gap $gap|| ec level $eclevel layer $layer"
     //%text.defl="MAKECODE-ARCADE"
     //%gap.defl=4
-    //%eclevel.min=1 eclevel.max=4 eclevel.defl=2
-    //%layer.min=1 layer.max=32 layer.defl=4
+    //%eclevel.min=0 eclevel.max=4 eclevel.defl=2
+    //%layer.min=0 layer.max=32 layer.defl=4
     //%group="image"
     //%weight=10
     export function genimg(text:string="",gap:number=4,eclevel:number=null,layer:number=null) {
         if (inprogress) {return image.create(1,1)}
         inprogress = true
-        if(eclevel === null) {eclevel = Math.min(Math.floor(Math.sqrt(sumbit(text,3.14,1.16,true) / ((3.14 * 3) / 4))),4)}
-        if(layer === null) {layer = Math.floor(Math.sqrt(sumbit(text,3.14,1.16,true) / (3.14 / 2)))}
+        if(eclevel === null) {eclevel = Math.min(Math.floor((Math.sqrt(sumbit(text,3.14,1.16,true) / ((3.14 * 3) / 4)))*4),4)}
+        if(layer === null) {layer = Math.floor(Math.sqrt(sumbit(text,1.16,3.14,true) / (3.14 / 1.16)))}
         let outputnll: number[][] = azgen(text,eclevel,layer)
         let outputimg: Image = image.create(outputnll[0].length,outputnll.length)
         let bin = 0
