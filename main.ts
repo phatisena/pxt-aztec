@@ -225,8 +225,8 @@ namespace aztec {
     export function genimg(text:string="",gap:number=4,eclevel:number=NaN,layer:number=NaN) {
         if (inprogress) {return image.create(1,1)}
         inprogress = true
-        if(isNaN(eclevel)) {eclevel = Math.min(Math.floor((Math.sqrt(sumbit(text,3.14,1.16,true) / ((3.14 * 3) / 4)))*4),4)}
-        if(isNaN(layer)) {layer = Math.floor(Math.sqrt(sumbit(text,1.16,3.14,true) / (3.14 / 1.16)))}
+        if(eclevel === NaN) {eclevel = Math.min(Math.floor((Math.sqrt(sumbit(text,3.14,1.16,true) / ((3.14 * 3) / 4)))*4),4)}
+        if(layer === NaN) {layer = Math.floor(Math.sqrt(sumbit(text,1.16,3.14,true) / (3.14 / 1.16)))}
         let outputnll: number[][] = azgen(text,eclevel,layer)
         let outputimg: Image = image.create(outputnll[0].length,outputnll.length)
         let bin = 0
