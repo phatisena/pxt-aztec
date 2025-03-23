@@ -125,7 +125,7 @@ namespace aztec {
                     enc[el + j - 1] = enc[el + j] ^ (p ? ex[(lg[rc[j]] + lg[p]) % s] : 0);
         }
         /** layout Aztec barcode */
-        let mat = addNumArr(2 * ctr + 1).fill(0).map(function () { return []; });
+        let mat: number[][] = addNumArr(2 * ctr + 1).fill(0).map(function () { return []; });
         for (y = 1 - typ; y < typ; y++) // layout central finder
             for (x = 1 - typ; x < typ; x++)
                 mat[ctr + y][ctr + x] = Math.max(Math.abs(x), Math.abs(y)) & 1 ^ 1;
@@ -155,6 +155,8 @@ namespace aztec {
                         else l += 4; // full turn -> next layer
                         j = l; // start new side
                     }
+                    const matmax = Math.max(x, y) - (Math.max(x, y) % 2)
+                    if (Math.abs(matmax - mat.length) > 0) do for (let jj = 0; jj < matmax; jj++) mat[jj][mat.length] = 0; while (Math.abs(matmax - mat.length) === 0)
                 }
             if (typ == 7) // layout reference grid
                 for (x = (15 - ctr) & -16; x <= ctr; x += 16)
@@ -215,32 +217,35 @@ namespace aztec {
     let inprogress = false
 
     //%blockid=aztec_createaztecimage
-    //%block="create aztec image by| text $text gap $gap|| ec level $eclevel layer $layer"
+    //%block="create aztec image by| text $text|| gap $gap ec level $eclevel layer $layer inverse $invert"
     //%text.defl="MAKECODE-ARCADE"
     //%gap.defl=4
     //%eclevel.min=0 eclevel.max=4 eclevel.defl=2
-    //%layer.min=0 layer.max=32 layer.defl=4
+    //%layer.min=0 layer.max=32 layer.defl=1
+    //%invert.shadow=toggleYesNo
     //%group="image"
     //%weight=10
-    export function genimg(text:string="",gap:number=4,eclevel:number=null,layer:number=null) {
+    export function genimg(text: string = "", gap: number = 4, eclevel: number = null, layer: number = null,invert:boolean=false) {
         if (inprogress) {return image.create(1,1)}
         inprogress = true
         if(eclevel === null) {eclevel = Math.min(Math.floor((Math.sqrt(sumbit(text,3.14,1.16,true) / ((3.14 * 3) / 4)))*4),4)}
         if(layer === null) {layer = Math.floor(Math.sqrt(sumbit(text,1.16,3.14,true) / (3.14 / 1.16)))}
         let outputnll: number[][] = azgen(text,eclevel,layer)
-        let outputimg: Image = image.create(outputnll[0].length,outputnll.length)
+        let outputimg: Image = image.create(outputnll[0].length-1,outputnll.length)
         let bin = 0
-        outputimg.fill(1)
+        outputimg.fill((invert)?15:1)
         for (let y = 0;y < outputnll.length;y++) {
             for (let x = 0;x < outputnll[y].length;x++) {
                 bin = outputnll[y][x]
-                if (bin > 0) outputimg.setPixel(x,y,15);
+                if (bin > 0) outputimg.setPixel(x,y,(invert)?1:15);
             }
         }
         let outputgap: Image = image.create(outputimg.width + (gap * 2),outputimg.height + (gap * 2))
-        outputgap.fill(1)
+        outputgap.fill((invert)?15:1)
         stampImage(outputimg,outputgap,gap,gap)
         inprogress = false
         return outputgap
     }
 }
+
+let mySprite = sprites.create(aztec.genimg("HI SMILE PLZ", 0), SpriteKind.Player)
