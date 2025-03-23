@@ -247,5 +247,3 @@ namespace aztec {
         return outputgap
     }
 }
-
-let mySprite = sprites.create(aztec.genimg("HI SMILE PLZ", 0), SpriteKind.Player)
